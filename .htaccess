@@ -1,0 +1,30 @@
+Options -Indexes
+DirectoryIndex index.php
+
+# Gzip compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json
+</IfModule>
+
+# Protect sensitive directories
+<FilesMatch "\.(sql|md|env)$">
+  Order Deny,Allow
+  Deny from all
+</FilesMatch>
+
+# Block direct API access without XHR header (basic CSRF protection)
+# Rewrite rules pour clean URLs (optionnel)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /cm2e-php/
+
+  # Protect uploads directory
+  RewriteRule ^uploads/.*\.php$ - [F,L]
+
+  # Cache static assets
+  <IfModule mod_headers.c>
+    <FilesMatch "\.(css|js|png|jpg|jpeg|gif|svg|ico|woff2?)$">
+      Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+  </IfModule>
+</IfModule>
