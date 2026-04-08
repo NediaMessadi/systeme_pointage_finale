@@ -7,8 +7,14 @@ $q   = currentQuarter();
 
 /* Date de la semaine demandée (offset en semaines) */
 $offset  = (int)($_GET['offset'] ?? 0);
-$monday  = date('Y-m-d', strtotime("monday this week +{$offset} weeks"));
-$friday  = date('Y-m-d', strtotime("friday this week +{$offset} weeks"));
+$ref     = new DateTime('now');
+$ref->modify('+' . ($offset * 7) . ' days');
+$dayNum  = (int)$ref->format('N');
+$ref->modify('-' . ($dayNum - 1) . ' days');
+$monday  = $ref->format('Y-m-d');
+$fridayDt = clone $ref;
+$fridayDt->modify('+4 days');
+$friday  = $fridayDt->format('Y-m-d');
 
 /* Tous les métrologues actifs */
 $stmt = $pdo->prepare(
@@ -34,9 +40,9 @@ foreach ($metrologues as $u) {
         $pstmt->execute([$u['id'], $day_date]);
         $pt = $pstmt->fetch();
 
-        /* Projet actif et tâche en cours */
+        /* Projet dont l'échéance = exactement ce jour */
         $tstmt = $pdo->prepare(
-            "SELECT p.id, p.code, p.due_date, p.completed_at, p.score_awarded,
+            "SELECT p.id, p.code, p.due_date, p.status, p.completed_at, p.score_awarded,
                     t.type, t.label, t.completed,
                     (SELECT COUNT(*) FROM tasks t3 WHERE t3.project_id=p.id) as total_tasks,
                     (SELECT COUNT(*) FROM tasks t4 WHERE t4.project_id=p.id AND t4.completed=1) as done_tasks,
@@ -45,10 +51,10 @@ foreach ($metrologues as $u) {
              LEFT JOIN tasks t ON t.project_id=p.id AND t.sort_order=(
                SELECT MIN(t2.sort_order) FROM tasks t2 WHERE t2.project_id=p.id AND t2.completed=0
              )
-             WHERE p.user_id=? AND p.status IN ('progress','pending')
+             WHERE p.user_id=? AND DATE(p.due_date) = ?
              LIMIT 1"
         );
-        $tstmt->execute([$u['id']]);
+        $tstmt->execute([$u['id'], $day_date]);
         $task = $tstmt->fetch();
 
         $allTasksDone = ($task && (int)$task['total_tasks'] > 0 && (int)$task['done_tasks'] === (int)$task['total_tasks']);

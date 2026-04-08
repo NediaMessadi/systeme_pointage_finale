@@ -162,16 +162,17 @@ const Admin = (() => {
       /* Detect if user has all tasks done on current project (from any day) */
       const allDone = row.days.some(d => d.all_tasks_done);
 
-      const cells = row.days.map(d => {
-        if (d.pointage === 'abs') return `<td class="tc">${presChip('abs')}</td>`;
-        if (d.all_tasks_done) {
-          /* All 4 tasks complete → show "Complet" badge */
-          return `<td class="tc"><span class="chip chip-done" style="font-size:11px;padding:3px 8px;font-weight:700">✓ Complet</span></td>`;
-        }
-        let cell = chipTask(d.task_type);
-        if (d.task_done) cell = `<span class="chip chip-done">✓</span>`;
-        return `<td class="tc">${cell}</td>`;
-      }).join('');
+       const cells = row.days.map(d => {
+  if (d.pointage === 'abs') return `<td class="tc">${presChip('abs')}</td>`;
+  if (!d.proj_code) return `<td class="tc"><span style="color:var(--txt3);font-size:10px">Pas de projet</span></td>`;
+  const codeEl = `<span style="font-size:10px;font-weight:800;color:var(--red);display:block;margin-bottom:2px">${d.proj_code}</span>`;
+
+  if (d.all_tasks_done) {
+    return `<td class="tc" style="vertical-align:middle">${codeEl}<span class="chip chip-done" style="font-size:10px;padding:2px 6px">✓ Complet</span></td>`;
+  }
+  const taskEl = d.task_done ? `<span class="chip chip-done">✓</span>` : chipTask(d.task_type);
+  return `<td class="tc" style="vertical-align:middle">${codeEl}${taskEl}</td>`;
+}).join('');
 
       /* Score : +1 only when positive (before deadline), never show negative in planning */
       let scoreHtml;
