@@ -63,7 +63,7 @@ const Admin = (() => {
   let timerInterval;
   const loadDashboard = async () => {
     const el = id => document.getElementById(id);
-    const r = await get(apiUrl('dashboard.php'));
+    const r = await get(apiUrl(`dashboard.php?_=${Date.now()}`));
     if (!r.success) return;
 
     /* Date */
