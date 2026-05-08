@@ -5,6 +5,8 @@ requireAuth();
 $pdo    = db();
 $method = $_SERVER['REQUEST_METHOD'];
 $id     = isset($_GET['id']) ? (int)$_GET['id'] : null;
+$isSqlite = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite';
+$nowExpr = $isSqlite ? "datetime('now','localtime')" : "NOW()";
 
 switch ($method) {
 
@@ -128,9 +130,9 @@ try { appLog('📁', "Nouveau projet créé : $code"); } catch (Throwable $e) {}
             $p = $proj->fetch();
             if (!$p || $p['user_id'] != currentUserId()) jsonResponse(['success'=>false,'error'=>'Accès refusé'], 403);
             $score  = computeProjectScore($p['due_date'], date('Y-m-d H:i:s'));
-            $pdo->prepare("UPDATE projects SET status='done',completed_at=NOW(),score_awarded=? WHERE id=?")->execute([$score,$id]);
+            $pdo->prepare("UPDATE projects SET status='done',completed_at={$nowExpr},score_awarded=? WHERE id=?")->execute([$score,$id]);
             $pdo->prepare("UPDATE users SET score=score+? WHERE id=?")->execute([$score,$p['user_id']]);
-            $pdo->prepare("UPDATE tasks SET completed=1,completed_at=NOW() WHERE project_id=? AND completed=0")->execute([$id]);
+            $pdo->prepare("UPDATE tasks SET completed=1,completed_at={$nowExpr} WHERE project_id=? AND completed=0")->execute([$id]);
             try { appLog('✅', "Projet ID $id terminé, score: $score"); } catch (Throwable $e) {}
 
             jsonResponse(['success'=>true,'score'=>$score]);

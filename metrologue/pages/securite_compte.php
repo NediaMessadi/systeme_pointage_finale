@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <div class="page-header animate-in">
-  <div><h1>Sécurité du compte</h1><div class="page-subtitle">Gérez votre mot de passe</div></div>
+  <div><h1><?= $lang['account_security'] ?></h1><div class="page-subtitle"><?= $lang['manage_password'] ?></div></div>
 </div>
 
 <?php if ($msg): ?><div class="alert alert-success animate-in">✓ <?= htmlspecialchars($msg) ?></div><?php endif; ?>
@@ -37,21 +37,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <div class="settings-card animate-in">
   <div class="settings-section">
-    <div class="settings-section-title"><span class="s-icon">🔑</span>Changer le mot de passe</div>
+    <div class="settings-section-title"><span class="s-icon">🔑</span><?= $lang['change_password'] ?></div>
     <form method="POST">
       <div class="fg" style="margin-bottom:14px">
-        <label class="fl">Mot de passe actuel</label>
+        <label class="fl"><?= $lang['current_password'] ?></label>
         <input class="fi" type="password" name="current_password" placeholder="••••••••" required>
       </div>
       <div class="fg" style="margin-bottom:14px">
-        <label class="fl">Nouveau mot de passe</label>
+        <label class="fl"><?= $lang['new_password'] ?></label>
         <input class="fi" type="password" name="new_password" placeholder="••••••••" minlength="8" required>
       </div>
       <div class="fg" style="margin-bottom:14px">
-        <label class="fl">Confirmer le nouveau mot de passe</label>
+        <label class="fl"><?= $lang['confirm_new_password'] ?></label>
         <input class="fi" type="password" name="confirm_password" placeholder="••••••••" required>
       </div>
-      <button type="submit" class="btn-primary" style="width:auto;padding:10px 28px">🔒 Mettre à jour</button>
+      <button type="submit" class="btn-primary" style="width:auto;padding:10px 28px">🔒 <?= $lang['update'] ?></button>
     </form>
   </div>
 </div>

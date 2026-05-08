@@ -70,9 +70,9 @@
             <option>Normale</option><option>Haute</option><option>Urgente</option>
           </select>
         </div>
-        <div class="fg"><label class="fl">Date de début</label><input class="fi" type="date" id="pm-start"></div>
+        <div class="fg"><label class="fl">Date de début</label><input class="fi" type="datetime-local" id="pm-start"></div>
       </div>
-      <div class="fg"><label class="fl">Date d'échéance *</label><input class="fi" type="date" id="pm-due"></div>
+      <div class="fg"><label class="fl">Date d'échéance *</label><input class="fi" type="datetime-local" id="pm-due"></div>
       <div class="fg"><label class="fl">Description</label>
         <textarea class="fi" id="pm-desc" rows="3" placeholder="Description du projet…" style="resize:vertical"></textarea>
       </div>

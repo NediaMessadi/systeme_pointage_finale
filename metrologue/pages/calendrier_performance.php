@@ -29,7 +29,9 @@ foreach ($stmt->fetchAll() as $p) {
 }
 
 $today = date('Y-m-d');
-$mois_noms = [1=>'Janvier',2=>'Février',3=>'Mars',4=>'Avril',5=>'Mai',6=>'Juin',7=>'Juillet',8=>'Août',9=>'Septembre',10=>'Octobre',11=>'Novembre',12=>'Décembre'];
+$mois_noms = ($_SESSION['lang'] ?? 'fr') === 'en'
+  ? [1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',7=>'July',8=>'August',9=>'September',10=>'October',11=>'November',12=>'December']
+  : [1=>'Janvier',2=>'Février',3=>'Mars',4=>'Avril',5=>'Mai',6=>'Juin',7=>'Juillet',8=>'Août',9=>'Septembre',10=>'Octobre',11=>'Novembre',12=>'Décembre'];
 
 /* Navigation */
 $prev_m = $pm - 3; $prev_y = $annee;
@@ -58,11 +60,11 @@ if ($next_m > 12) { $next_m -= 12; $next_y++; }
 
 <!-- Légende -->
 <div class="cal-legend animate-in">
-  <span class="legend-item"><span class="legend-dot dot-pos"></span> Projet terminé avant deadline (+1)</span>
-  <span class="legend-item"><span class="legend-dot dot-zero"></span> Terminé le jour J (0)</span>
-  <span class="legend-item"><span class="legend-dot dot-neg"></span> Terminé après deadline (-1)</span>
-  <span class="legend-item"><span class="legend-dot dot-abs"></span> Absent</span>
-  <span class="legend-item"><span class="legend-dot dot-late"></span> Retard</span>
+  <span class="legend-item"><span class="legend-dot dot-pos"></span><?= $lang['legend_before_deadline'] ?></span>
+  <span class="legend-item"><span class="legend-dot dot-zero"></span><?= $lang['legend_on_time'] ?></span>
+  <span class="legend-item"><span class="legend-dot dot-neg"></span><?= $lang['legend_after_deadline'] ?></span>
+  <span class="legend-item"><span class="legend-dot dot-abs"></span><?= $lang['absent'] ?></span>
+  <span class="legend-item"><span class="legend-dot dot-late"></span><?= $lang['late'] ?></span>
 </div>
 
 <!-- Calendriers -->

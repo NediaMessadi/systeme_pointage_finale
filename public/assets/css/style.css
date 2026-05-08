@@ -40,6 +40,44 @@ input, select, textarea { font-family: inherit; }
   --txt3:   #64748B;
 }
 .text-large { font-size: 16px; }
+.text-large .page-header h1 { font-size: 26px; }
+.text-large .page-subtitle { font-size: 15px; }
+.text-large .settings-section-title,
+.text-large .card-title { font-size: 17px; }
+.text-large .settings-label,
+.text-large .fl,
+.text-large .info-label,
+.text-large .kpi-label,
+.text-large .me-score-lbl,
+.text-large .me-hero-date,
+.text-large .me-hero-sub,
+.text-large .auth-link,
+.text-large .nav-section-label { font-size: 14px; }
+.text-large .toggle-btn,
+.text-large .btn-secondary,
+.text-large .btn-primary,
+.text-large .filter-select,
+.text-large .search-input input,
+.text-large .fi,
+.text-large input,
+.text-large select,
+.text-large textarea { font-size: 16px; }
+.text-large .sidebar-profile-info h4,
+.text-large .nav a,
+.text-large .logout-btn,
+.text-large .proj-card-btn,
+.text-large .info-value,
+.text-large .lb-name,
+.text-large .cp-desc,
+.text-large .task-label { font-size: 15px; }
+.text-large .me-hero-title { font-size: 28px; }
+.text-large .me-score-val { font-size: 56px; }
+.text-large .kpi-value { font-size: 26px; }
+.text-large .chip,
+.text-large .task-chip,
+.text-large .score-chip,
+.text-large .legend-item,
+.text-large .task-date { font-size: 13px; }
 
 /* ═══════════════════════════════════════════════
    AUTH PAGE
@@ -224,7 +262,6 @@ input, select, textarea { font-family: inherit; }
 .dash-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
 /* ── Projet courant ───────────────────────────── */
-.current-proj {}
 .cp-code { font-size: 18px; font-weight: 800; color: var(--red); margin-bottom: 4px; }
 .cp-desc { font-size: 13px; color: var(--txt2); margin-bottom: 10px; }
 .cp-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 12px; }
@@ -278,7 +315,6 @@ input, select, textarea { font-family: inherit; }
 
 /* ── Projet Grid ─────────────────────────────── */
 .proj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.proj-info-card {}
 .proj-meta-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
 .proj-due { font-size: 12px; color: var(--txt3); }
 .proj-due-late { color: var(--red); }

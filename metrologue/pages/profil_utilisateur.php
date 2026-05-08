@@ -40,7 +40,7 @@ $initiale = strtoupper(substr($user['prenom'],0,1));
 ?>
 
 <div class="page-header animate-in">
-  <div><h1>Mon profil</h1><div class="page-subtitle">Vos informations personnelles</div></div>
+  <div><h1><?= $lang['my_profile'] ?></h1><div class="page-subtitle"><?= $lang['profile_subtitle'] ?></div></div>
 </div>
 
 <?php if ($msg): ?><div class="alert alert-success animate-in">✓ <?= htmlspecialchars($msg) ?></div><?php endif; ?>
@@ -58,7 +58,7 @@ $initiale = strtoupper(substr($user['prenom'],0,1));
     </div>
     <form method="POST" enctype="multipart/form-data" style="margin-top:12px">
       <label class="btn-secondary" style="cursor:pointer;display:inline-block">
-        📷 Changer la photo
+        📷 <?= $lang['change_photo'] ?>
         <input type="file" name="photo" accept="image/*" style="display:none" onchange="previewPhoto(this);this.form.submit()">
       </label>
     </form>
@@ -66,27 +66,27 @@ $initiale = strtoupper(substr($user['prenom'],0,1));
 
   <!-- Infos personnelles -->
   <div class="settings-section">
-    <div class="settings-section-title"><span class="s-icon">👤</span>Informations personnelles</div>
+    <div class="settings-section-title"><span class="s-icon">👤</span><?= $lang['personal_information'] ?></div>
     <form method="POST">
       <div class="fr2" style="margin-bottom:14px">
-        <div class="fg"><label class="fl">Prénom</label><input class="fi" type="text" name="prenom" value="<?= htmlspecialchars($user['prenom']) ?>" required></div>
-        <div class="fg"><label class="fl">Nom</label><input class="fi" type="text" name="nom" value="<?= htmlspecialchars($user['nom']) ?>" required></div>
+        <div class="fg"><label class="fl"><?= $lang['first_name'] ?></label><input class="fi" type="text" name="prenom" value="<?= htmlspecialchars($user['prenom']) ?>" required></div>
+        <div class="fg"><label class="fl"><?= $lang['last_name'] ?></label><input class="fi" type="text" name="nom" value="<?= htmlspecialchars($user['nom']) ?>" required></div>
       </div>
-      <div class="fg" style="margin-bottom:14px"><label class="fl">Téléphone</label><input class="fi" type="tel" name="telephone" value="<?= htmlspecialchars($user['telephone'] ?? '') ?>"></div>
-      <button type="submit" name="update_profile" value="1" class="btn-primary" style="width:auto;padding:10px 28px">💾 Enregistrer</button>
+      <div class="fg" style="margin-bottom:14px"><label class="fl"><?= $lang['phone'] ?></label><input class="fi" type="tel" name="telephone" value="<?= htmlspecialchars($user['telephone'] ?? '') ?>"></div>
+      <button type="submit" name="update_profile" value="1" class="btn-primary" style="width:auto;padding:10px 28px">💾 <?= $lang['save'] ?></button>
     </form>
   </div>
 
   <!-- Infos compte (lecture seule) -->
   <div class="settings-section">
-    <div class="settings-section-title"><span class="s-icon">🔑</span>Informations du compte</div>
-    <div class="info-row"><span class="info-label">Email</span><span class="info-value"><?= htmlspecialchars($user['email']) ?></span></div>
-    <div class="info-row"><span class="info-label">Rôle</span><span class="info-value"><?= ucfirst($user['role']) ?></span></div>
-    <div class="info-row"><span class="info-label">Niveau</span><span class="info-value"><?= htmlspecialchars($user['niveau']) ?></span></div>
-    <div class="info-row"><span class="info-label">Poste</span><span class="info-value"><?= htmlspecialchars($user['poste'] ?? '—') ?></span></div>
-    <div class="info-row"><span class="info-label">Classeur</span><span class="info-value"><?= $user['classeur'] ?></span></div>
-    <div class="info-row"><span class="info-label">Embauché le</span><span class="info-value"><?= $user['hire_date'] ? date('d/m/Y',strtotime($user['hire_date'])) : '—' ?></span></div>
-    <div class="info-row"><span class="info-label">Score actuel</span><span class="info-value"><strong><?= $user['score'] >= 0 ? '+'.$user['score'] : $user['score'] ?></strong></span></div>
+    <div class="settings-section-title"><span class="s-icon">🔑</span><?= $lang['account_information'] ?></div>
+    <div class="info-row"><span class="info-label"><?= $lang['email'] ?></span><span class="info-value"><?= htmlspecialchars($user['email']) ?></span></div>
+    <div class="info-row"><span class="info-label"><?= $lang['role'] ?></span><span class="info-value"><?= ucfirst($user['role']) ?></span></div>
+    <div class="info-row"><span class="info-label"><?= $lang['level'] ?></span><span class="info-value"><?= htmlspecialchars($user['niveau']) ?></span></div>
+    <div class="info-row"><span class="info-label"><?= $lang['position'] ?></span><span class="info-value"><?= htmlspecialchars($user['poste'] ?? '—') ?></span></div>
+    <div class="info-row"><span class="info-label"><?= $lang['binder'] ?></span><span class="info-value"><?= $user['classeur'] ?></span></div>
+    <div class="info-row"><span class="info-label"><?= $lang['hired_on'] ?></span><span class="info-value"><?= $user['hire_date'] ? date('d/m/Y',strtotime($user['hire_date'])) : '—' ?></span></div>
+    <div class="info-row"><span class="info-label"><?= $lang['current_score'] ?></span><span class="info-value"><strong><?= $user['score'] >= 0 ? '+'.$user['score'] : $user['score'] ?></strong></span></div>
   </div>
 
 </div>

@@ -5,6 +5,7 @@
   </div>
   <div style="display:flex;gap:8px;align-items:center">
     <div class="rfid-badge" id="rfid-status">📡 RFID actif</div>
+    <button class="btn-sec" onclick="Admin.openShiftModal()">🕒 Affecter horaires</button>
     <button class="btn-prim" onclick="Admin.openPtModal()">+ Pointage manuel</button>
   </div>
 </div>
@@ -29,6 +30,17 @@
   <div class="kpi kpi-o"><div class="kpi-ico">⚠️</div><div class="kpi-val" id="pt-late">—</div><div class="kpi-lbl">En retard</div></div>
   <div class="kpi kpi-r"><div class="kpi-ico">❌</div><div class="kpi-val" id="pt-abs">—</div><div class="kpi-lbl">Absents</div></div>
   <div class="kpi kpi-b"><div class="kpi-ico">📡</div><div class="kpi-val" id="pt-rfid">—</div><div class="kpi-lbl">Via RFID</div></div>
+</div>
+
+<!-- Horaires assignés -->
+<div class="card" style="margin-bottom:16px">
+  <div class="card-hd" style="margin-bottom:10px">
+    <div>
+      <div class="card-title">🕒 Horaires de travail assignés</div>
+      <div class="card-sub" id="pt-shift-sub">Pour la date sélectionnée</div>
+    </div>
+  </div>
+  <div id="pt-shift-body" class="tbl-empty" style="padding:8px 0">Chargement…</div>
 </div>
 
 <!-- Tableau -->
@@ -82,6 +94,38 @@
     <div class="modal-foot">
       <button class="btn-sec" onclick="Admin.closePtModal()">Annuler</button>
       <button class="btn-prim" onclick="Admin.savePointage()">✓ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Affectation horaires -->
+<div class="overlay" id="shiftModal" onclick="if(event.target===this)Admin.closeShiftModal()">
+  <div class="modal modal-md">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title" id="shift-title">🕒 Affecter un horaire de travail</div>
+        <div class="modal-sub">Choisissez une date, un métrologue (ou tous), puis l'heure assignée</div>
+      </div>
+      <button class="modal-x" onclick="Admin.closeShiftModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fr2">
+        <div class="fg"><label class="fl">Date *</label><input class="fi" type="date" id="shift-date" onchange="Admin.refreshShiftModalList()"></div>
+        <div class="fg"><label class="fl">Métrologue *</label>
+          <select class="fi" id="shift-user">
+            <option value="">Tous les métrologues actifs</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Heure assignée *</label><input class="fi" type="time" id="shift-time" value="08:00"></div>
+      <div class="fg" style="margin-top:14px">
+        <label class="fl">Affectations déjà définies pour cette date</label>
+        <div id="shift-existing" class="shift-list">Chargement…</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-sec" onclick="Admin.closeShiftModal()">Annuler</button>
+      <button class="btn-prim" onclick="Admin.saveShiftAssignment()">✓ Enregistrer</button>
     </div>
   </div>
 </div>

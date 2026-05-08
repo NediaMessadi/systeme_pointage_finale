@@ -105,6 +105,6 @@ $photo   = $_SESSION['user_photo']  ?? null;
 
 </div>
 
-<script src="../public/assets/js/admin.js"></script>
+<script src="../public/assets/js/admin.js?v=<?= @filemtime(__DIR__ . '/../public/assets/js/admin.js') ?: time() ?>"></script>
 </body>
 </html>

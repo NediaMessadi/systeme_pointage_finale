@@ -92,6 +92,26 @@ CREATE TABLE IF NOT EXISTS `pointages` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ─────────────────────────────────────────────
+-- HORAIRES AFFECTÉS (planification des heures)
+-- ─────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS `working_time_assignments` (
+  `id`         INT UNSIGNED    NOT NULL AUTO_INCREMENT,
+  `user_id`    INT UNSIGNED    NOT NULL,
+  `work_date`  DATE            NOT NULL,
+  `start_time` TIME            NOT NULL,
+  `end_time`   TIME            NOT NULL,
+  `note`       VARCHAR(255)    DEFAULT NULL,
+  `created_by` INT UNSIGNED    DEFAULT NULL,
+  `created_at` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_wta_user_date` (`user_id`,`work_date`),
+  KEY `idx_wta_work_date` (`work_date`),
+  CONSTRAINT `fk_wta_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_wta_creator` FOREIGN KEY (`created_by`) REFERENCES `users`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ─────────────────────────────────────────────
 -- SCORES TRIMESTRIELS
 -- ─────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS `quarter_scores` (

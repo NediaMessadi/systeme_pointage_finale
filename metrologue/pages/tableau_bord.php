@@ -50,8 +50,13 @@ foreach ($leaderboard as $i => $row) {
 }
 
 function dateFr(): string {
-    $j = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
-    $m = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  $isEnglish = ($_SESSION['lang'] ?? 'fr') === 'en';
+  $j = $isEnglish
+    ? ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+    : ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  $m = $isEnglish
+    ? ['', 'January','February','March','April','May','June','July','August','September','October','November','December']
+    : ['', 'Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
     return $j[date('w')] . ' ' . date('j') . ' ' . $m[(int)date('n')] . ' ' . date('Y');
 }
 ?>
@@ -60,12 +65,12 @@ function dateFr(): string {
 <div class="me-hero animate-in">
   <div class="me-hero-left">
     <div class="me-hero-date"><?= dateFr() ?></div>
-    <h1 class="me-hero-title">Bonjour, <?= htmlspecialchars($prenom ?? '') ?> 👋</h1>
-    <p class="me-hero-sub">Voici votre espace de travail du jour</p>
+    <h1 class="me-hero-title"><?= sprintf($lang['hello_user'], htmlspecialchars($prenom ?? '')) ?></h1>
+    <p class="me-hero-sub"><?= $lang['workspace_today'] ?></p>
   </div>
   <div class="me-hero-score">
     <div class="me-score-val"><?= $score_trimestre >= 0 ? '+' . $score_trimestre : $score_trimestre ?></div>
-    <div class="me-score-lbl">Score trimestre</div>
+    <div class="me-score-lbl"><?= $lang['score_trimester'] ?></div>
   </div>
 </div>
 
@@ -75,28 +80,28 @@ function dateFr(): string {
     <div class="kpi-icon">📁</div>
     <div class="kpi-data">
       <div class="kpi-value"><?= $total_projets ?></div>
-      <div class="kpi-label">Projets total</div>
+      <div class="kpi-label"><?= $lang['projects_total'] ?></div>
     </div>
   </div>
   <div class="kpi-card">
     <div class="kpi-icon">✅</div>
     <div class="kpi-data">
       <div class="kpi-value"><?= $projets_termines ?></div>
-      <div class="kpi-label">Terminés</div>
+      <div class="kpi-label"><?= $lang['completed'] ?></div>
     </div>
   </div>
   <div class="kpi-card">
     <div class="kpi-icon">🏅</div>
     <div class="kpi-data">
       <div class="kpi-value">#<?= $my_rank ?></div>
-      <div class="kpi-label">Classement</div>
+      <div class="kpi-label"><?= $lang['ranking'] ?></div>
     </div>
   </div>
   <div class="kpi-card <?= $score_trimestre >= 0 ? 'kpi-card-pos' : 'kpi-card-neg' ?>">
     <div class="kpi-icon"><?= $score_trimestre >= 0 ? '📈' : '📉' ?></div>
     <div class="kpi-data">
       <div class="kpi-value"><?= $score_trimestre >= 0 ? '+' . $score_trimestre : $score_trimestre ?></div>
-      <div class="kpi-label">Score trimestre</div>
+      <div class="kpi-label"><?= $lang['score_trimester'] ?></div>
     </div>
   </div>
 </div>
@@ -105,18 +110,18 @@ function dateFr(): string {
 
   <!-- Projet en cours -->
   <div class="card animate-in">
-    <div class="card-title">▶ Projet en cours</div>
+    <div class="card-title">▶ <?= $lang['current_project'] ?></div>
     <?php if ($projet_actuel): ?>
       <div class="current-proj">
         <div class="cp-code"><?= htmlspecialchars($projet_actuel['code']) ?></div>
         <div class="cp-desc"><?= htmlspecialchars($projet_actuel['description'] ?? '') ?></div>
         <div class="cp-meta">
           <span class="chip <?= $projet_actuel['status']==='progress'?'chip-prog':'chip-wait' ?>">
-            <?= $projet_actuel['status']==='progress' ? 'En cours' : 'En attente' ?>
+            <?= $projet_actuel['status']==='progress' ? $lang['status_in_progress'] : $lang['status_pending'] ?>
           </span>
           <?php if ($projet_actuel['due_date']): ?>
             <span style="font-size:12px;color:var(--txt3)">
-              Échéance : <?= date('d/m/Y', strtotime($projet_actuel['due_date'])) ?>
+              <?= $lang['due_date'] ?> : <?= date('d/m/Y', strtotime($projet_actuel['due_date'])) ?>
             </span>
           <?php endif; ?>
         </div>
@@ -127,27 +132,27 @@ function dateFr(): string {
         ?>
         <div class="cp-progress">
           <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
-            <span><?= $done ?>/<?= $total ?> tâches</span>
+            <span><?= sprintf($lang['tasks_count'], $done, $total) ?></span>
             <span style="font-weight:700"><?= $pct ?>%</span>
           </div>
           <div class="pbar-bg"><div class="pbar-fill" style="width:<?= $pct ?>%"></div></div>
         </div>
         <a href="?page=projet_courant" class="btn-primary" style="display:inline-block;text-align:center;text-decoration:none;margin-top:12px">
-          Accéder au projet →
+          <?= $lang['access_project'] ?> →
         </a>
       </div>
     <?php else: ?>
       <div class="empty-state">
         <div class="empty-ico">📭</div>
-        <p>Aucun projet actif pour l'instant.</p>
-        <p style="font-size:12px;color:var(--txt3)">Un projet vous sera assigné par l'administrateur.</p>
+        <p><?= $lang['no_active_project_yet'] ?></p>
+        <p style="font-size:12px;color:var(--txt3)"><?= $lang['project_assigned_admin'] ?></p>
       </div>
     <?php endif; ?>
   </div>
 
   <!-- Classement -->
   <div class="card animate-in">
-    <div class="card-title">🏆 Classement — <?= $q['label'] ?></div>
+    <div class="card-title">🏆 <?= $lang['ranking'] ?> — <?= $q['label'] ?></div>
     <?php foreach (array_slice($leaderboard, 0, 5) as $i => $row): ?>
       <div class="lb-row <?= $row['id']==$uid ? 'lb-me' : '' ?>">
         <div class="lb-rank"><?= $i===0 ? '🥇' : ($i===1 ? '🥈' : ($i===2 ? '🥉' : ($i+1))) ?></div>
@@ -163,7 +168,7 @@ function dateFr(): string {
       </div>
     <?php endforeach; ?>
     <?php if (empty($leaderboard)): ?>
-      <div class="empty-state"><p>Aucune donnée</p></div>
+      <div class="empty-state"><p><?= $lang['no_data'] ?></p></div>
     <?php endif; ?>
   </div>
 

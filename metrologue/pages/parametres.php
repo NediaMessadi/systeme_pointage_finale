@@ -2,8 +2,8 @@
 
 <div class="page-header animate-in">
   <div>
-    <h1>Paramètres</h1>
-    <div class="page-subtitle">Personnalisez votre interface</div>
+    <h1><?= $lang['settings'] ?></h1>
+    <div class="page-subtitle"><?= $lang['settings_subtitle'] ?></div>
   </div>
 </div>
 
@@ -12,13 +12,13 @@
   <!-- Langue -->
   <div class="settings-section">
     <div class="settings-section-title"><span class="s-icon">🌐</span><?= $lang['language_section'] ?></div>
-    <form method="POST" action="../../lang_init.php">
+    <form method="POST" action="../lang_init.php">
       <input type="hidden" name="_redirect" value="<?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>">
       <div class="settings-row">
         <label class="settings-label"><?= $lang['language'] ?></label>
         <div class="toggle-group">
-          <button type="submit" name="lang" value="fr" class="toggle-btn <?= ($_SESSION['lang']??'fr')==='fr'?'active':'' ?>">🇫🇷 Français</button>
-          <button type="submit" name="lang" value="en" class="toggle-btn <?= ($_SESSION['lang']??'fr')==='en'?'active':'' ?>">🇬🇧 English</button>
+          <button type="submit" name="lang" value="fr" class="toggle-btn <?= ($_SESSION['lang']??'fr')==='fr'?'active':'' ?>">🇫🇷 <?= $lang['french'] ?></button>
+          <button type="submit" name="lang" value="en" class="toggle-btn <?= ($_SESSION['lang']??'fr')==='en'?'active':'' ?>">🇬🇧 <?= $lang['english'] ?></button>
         </div>
       </div>
     </form>
@@ -27,7 +27,7 @@
   <!-- Thème -->
   <div class="settings-section">
     <div class="settings-section-title"><span class="s-icon">🎨</span><?= $lang['theme'] ?></div>
-    <form method="POST" action="../../lang_init.php">
+    <form method="POST" action="../lang_init.php">
       <input type="hidden" name="_redirect" value="<?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>">
       <div class="settings-row">
         <label class="settings-label"><?= $lang['theme'] ?></label>
@@ -42,7 +42,7 @@
   <!-- Taille texte -->
   <div class="settings-section">
     <div class="settings-section-title"><span class="s-icon">🔤</span><?= $lang['text_size'] ?></div>
-    <form method="POST" action="../../lang_init.php">
+    <form method="POST" action="../lang_init.php">
       <input type="hidden" name="_redirect" value="<?= htmlspecialchars($_SERVER['REQUEST_URI']) ?>">
       <div class="settings-row">
         <label class="settings-label"><?= $lang['text_size'] ?></label>

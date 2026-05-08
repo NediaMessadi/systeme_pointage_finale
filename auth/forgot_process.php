@@ -95,10 +95,6 @@ if ($step === 2) {
         }
     }
 
-    try {
-        sysLog('🔑', 'Réinitialisation mot de passe — user #' . $userId, 'warn', $userId);
-    } catch (Exception $e) {}
-
     /* Nettoyer les données de reset */
     unset($_SESSION['reset_email'], $_SESSION['reset_user_id'], $_SESSION['reset_step']);
     $_SESSION['reset_step'] = 3;

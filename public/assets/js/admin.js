@@ -295,13 +295,15 @@ const Admin = (() => {
   };
 
   const populateUserDropdowns = (users) => {
-    ['proj-filter-user','pt-filter-user','ptm-user','pm-user'].forEach(selId => {
+    ['proj-filter-user','pt-filter-user','ptm-user','pm-user','shift-user'].forEach(selId => {
       const sel = document.getElementById(selId);
       if (!sel) return;
       const cur = sel.value;
       const opts = users.map(u => `<option value="${u.id}">${u.prenom} ${u.nom}</option>`).join('');
       if (selId === 'proj-filter-user' || selId === 'pt-filter-user') {
         sel.innerHTML = `<option value="">Tous les métrologues</option>` + opts;
+      } else if (selId === 'shift-user') {
+        sel.innerHTML = `<option value="">Tous les métrologues actifs</option>` + opts;
       } else {
         sel.innerHTML = `<option value="">— Sélectionner un métrologue —</option>` + opts;
       }
@@ -486,8 +488,15 @@ const Admin = (() => {
         document.getElementById('pm-id').value        = p.id;
         document.getElementById('pm-user').value      = p.user_id || '';
         document.getElementById('pm-priority').value  = p.priority;
-        document.getElementById('pm-start').value     = p.start_date || '';
-        document.getElementById('pm-due').value       = p.due_date  || '';
+        document.getElementById('pm-start').value =
+          p.start_date
+          ? p.start_date.replace(' ', 'T').substring(0,16)
+           : '';
+
+        document.getElementById('pm-due').value =
+           p.due_date
+           ? p.due_date.replace(' ', 'T').substring(0,16)
+           : '';
         document.getElementById('pm-desc').value      = p.description || '';
         document.getElementById('pm-del-btn').style.display = 'inline-flex';
         document.getElementById('pm-code-display').textContent = p.code;
@@ -611,6 +620,109 @@ const data = {
       <td style="color:var(--txt3);font-size:12px">${p.note || '—'}</td>
       <td><button class="tb-btn" onclick="Admin.openPtEdit(${p.id})">✏️</button></td>
     </tr>`).join('') || `<tr><td colspan="9" class="tbl-empty">Aucun pointage pour cette date</td></tr>`;
+
+    loadShiftAssignments(date);
+  };
+
+  const tomorrowIso = () => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().slice(0, 10);
+  };
+
+  const renderShiftList = (targetId, rows) => {
+    const box = document.getElementById(targetId);
+    if (!box) return;
+    if (!rows || !rows.length) {
+      box.innerHTML = '<div class="tbl-empty" style="padding:10px 0">Aucune affectation pour cette date</div>';
+      return;
+    }
+    box.innerHTML = rows.map(s => `
+      <div class="shift-item">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="lb-av" style="background:${s.color || '#E31E24'}">${ini(s.prenom, s.nom)}</div>
+          <div style="font-weight:600">${s.prenom} ${s.nom}</div>
+        </div>
+        <div class="shift-hours">${(s.assigned_time || '—').slice(0, 5)}</div>
+        <div class="shift-note">${s.note || '—'}</div>
+      </div>
+    `).join('');
+  };
+
+  const loadShiftAssignments = async (date = null, targetId = 'pt-shift-body') => {
+    const workDate = date || document.getElementById('pt-date')?.value || new Date().toISOString().slice(0, 10);
+    const r = await get(apiUrl(`pointages.php?action=assigned_times&date=${workDate}`));
+
+    const sub = document.getElementById('pt-shift-sub');
+    if (sub && targetId === 'pt-shift-body') {
+      sub.textContent = `Affectations du ${fmtDate(workDate)}`;
+    }
+
+    if (!r.success) {
+      const box = document.getElementById(targetId);
+      if (box) box.innerHTML = '<div class="tbl-empty" style="padding:10px 0">Erreur de chargement</div>';
+      return;
+    }
+
+    renderShiftList(targetId, r.data || []);
+  };
+
+  const openShiftModal = async () => {
+    const modal = document.getElementById('shiftModal');
+    if (!modal) return;
+
+    const dateInput = document.getElementById('shift-date');
+    dateInput.value = tomorrowIso();
+    document.getElementById('shift-user').value = '';
+    document.getElementById('shift-time').value = '08:00';
+
+    modal.classList.add('open');
+    await loadShiftAssignments(dateInput.value, 'shift-existing');
+  };
+
+  const closeShiftModal = () => document.getElementById('shiftModal')?.classList.remove('open');
+
+  const refreshShiftModalList = async () => {
+    const date = document.getElementById('shift-date')?.value;
+    await loadShiftAssignments(date, 'shift-existing');
+  };
+
+  const saveShiftAssignment = async () => {
+    const date = document.getElementById('shift-date')?.value;
+    const userId = document.getElementById('shift-user')?.value || null;
+    const assignedTime = document.getElementById('shift-time')?.value;
+
+    if (!date || !assignedTime) {
+      toast('Date et heure requises', 'err');
+      return;
+    }
+
+    const r = await post(apiUrl('horaires.php'), {
+      action: 'assign_time',
+      date,
+      user_id: userId,
+      assigned_time: assignedTime,
+    });
+
+    let rr = r;
+    if (!rr.success) {
+      rr = await post(apiUrl('pointages.php'), {
+        action: 'assign_time',
+        date,
+        user_id: userId,
+        assigned_time: assignedTime,
+      });
+    }
+
+    if (!rr.success) {
+      toast(rr.error || 'Erreur lors de l\'affectation', 'err');
+      return;
+    }
+
+    toast(`Horaire affecté (${rr.assigned_count || 0}) ✓`);
+    await loadShiftAssignments(date, 'shift-existing');
+    const ptDate = document.getElementById('pt-date')?.value;
+    if (ptDate === date) await loadShiftAssignments(date);
   };
 
   const openPtModal = (id = null) => {
@@ -817,6 +929,7 @@ const data = {
     openProjModal, closeProjModal, saveProject, deleteProject,
     openProjDetail, closeProjDetail,
     loadPointages, openPtModal, openPtEdit, closePtModal, savePointage,
+    openShiftModal, closeShiftModal, refreshShiftModalList, saveShiftAssignment, loadShiftAssignments,
     loadPlanning, weekNav,
     loadScores, openChampModal, closeChampModal, saveChampion, confirmResetScores,
     loadLogs, loadSysInfo, saveSysSettings,

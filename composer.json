@@ -1,0 +1,9 @@
+{
+  "name": "cm2e/php-backend",
+  "description": "CM2E backend with MQTT bridge",
+  "type": "project",
+  "require": {
+    "php": ">=8.0",
+    "php-mqtt/client": "^1.8"
+  }
+}

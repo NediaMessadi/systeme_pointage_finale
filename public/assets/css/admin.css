@@ -289,6 +289,37 @@ select.fi { background: var(--surface); }
 /* ── RFID Badge ──────────────────────────────── */
 .rfid-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; background: #d1fae5; color: #065f46; font-size: 12px; font-weight: 700; }
 
+/* ── Horaires assignés ───────────────────────── */
+.shift-list {
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  min-height: 44px;
+  max-height: 220px;
+  overflow: auto;
+}
+.shift-item {
+  display: grid;
+  grid-template-columns: 1.2fr .7fr 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.shift-item:last-child { border-bottom: none; }
+.shift-hours {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--blue);
+}
+.shift-note {
+  font-size: 11px;
+  color: var(--txt3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ── Info Items ──────────────────────────────── */
 .info-item { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); }
 .info-item:last-child { border-bottom: none; }
@@ -321,4 +352,5 @@ code.code-inline { background: var(--bg); border: 1px solid var(--border); borde
   .main-content { margin-left: 0; padding: 18px 16px; }
   .two-col { grid-template-columns: 1fr; }
   .kpi-row { grid-template-columns: 1fr 1fr; }
+  .shift-item { grid-template-columns: 1fr; }
 }

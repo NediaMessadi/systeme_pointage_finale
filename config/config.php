@@ -145,7 +145,7 @@ function generateProjectCode(): string {
 
 /* ── Calculer le score d'un projet ─────────────── */
 function computeProjectScore(string $dueDate, string $completedAt): int {
-    $due  = new DateTime($dueDate.' 23:59:59');
+    $due = new DateTime($dueDate);
     $done = new DateTime($completedAt);
     $diff = $done->getTimestamp() - $due->getTimestamp();
     if ($diff < 0)  return 1;   // avant deadline

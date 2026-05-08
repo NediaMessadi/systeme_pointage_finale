@@ -35,17 +35,17 @@ $projects = $stmt->fetchAll();
     <input type="hidden" name="page" value="projets">
     <div class="search-input">
       <span class="search-icon">🔍</span>
-      <input type="text" name="search" placeholder="Code ou description…" value="<?= htmlspecialchars($search) ?>">
+      <input type="text" name="search" placeholder="<?= htmlspecialchars($lang['code_or_description'], ENT_QUOTES) ?>" value="<?= htmlspecialchars($search) ?>">
     </div>
   </form>
   <form method="GET">
     <input type="hidden" name="page" value="projets">
     <input type="hidden" name="search" value="<?= htmlspecialchars($search) ?>">
     <select name="status" class="filter-select" onchange="this.form.submit()">
-      <option value="">Tous les statuts</option>
-      <option value="pending"  <?= $status_filter==='pending'  ?'selected':'' ?>>En attente</option>
-      <option value="progress" <?= $status_filter==='progress' ?'selected':'' ?>>En cours</option>
-      <option value="done"     <?= $status_filter==='done'     ?'selected':'' ?>>Terminé</option>
+      <option value=""><?= $lang['all_statuses'] ?></option>
+      <option value="pending"  <?= $status_filter==='pending'  ?'selected':'' ?>><?= $lang['status_pending'] ?></option>
+      <option value="progress" <?= $status_filter==='progress' ?'selected':'' ?>><?= $lang['status_in_progress'] ?></option>
+      <option value="done"     <?= $status_filter==='done'     ?'selected':'' ?>><?= $lang['status_done'] ?></option>
     </select>
   </form>
 </div>
@@ -54,7 +54,7 @@ $projects = $stmt->fetchAll();
 <?php if (empty($projects)): ?>
   <div class="empty-state card animate-in">
     <div class="empty-ico">📂</div>
-    <p>Aucun projet trouvé.</p>
+    <p><?= $lang['no_project_found'] ?></p>
   </div>
 <?php else: ?>
   <div class="projects-grid animate-in">
@@ -68,9 +68,9 @@ $projects = $stmt->fetchAll();
         <div class="proj-card-top">
           <div class="proj-code"><?= htmlspecialchars($p['code']) ?></div>
           <?php
-            if ($p['status']==='done')    echo '<span class="chip chip-done">Terminé</span>';
-            elseif ($p['status']==='progress') echo '<span class="chip chip-prog">En cours</span>';
-            else echo '<span class="chip chip-wait">En attente</span>';
+            if ($p['status']==='done')    echo '<span class="chip chip-done">' . $lang['status_done'] . '</span>';
+            elseif ($p['status']==='progress') echo '<span class="chip chip-prog">' . $lang['status_in_progress'] . '</span>';
+            else echo '<span class="chip chip-wait">' . $lang['status_pending'] . '</span>';
           ?>
         </div>
         <?php if ($p['description']): ?>
@@ -90,12 +90,12 @@ $projects = $stmt->fetchAll();
         </div>
         <div style="margin-top:8px">
           <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--txt3);margin-bottom:3px">
-            <span><?= $done ?>/<?= $total ?> tâches</span><span><?= $pct ?>%</span>
+            <span><?= sprintf($lang['tasks_count'], $done, $total) ?></span><span><?= $pct ?>%</span>
           </div>
           <div class="pbar-bg"><div class="pbar-fill" style="width:<?= $pct ?>%"></div></div>
         </div>
         <?php if ($p['status'] !== 'done'): ?>
-          <a href="?page=projet_courant" class="proj-card-btn">Voir le projet →</a>
+          <a href="?page=projet_courant" class="proj-card-btn"><?= $lang['view_project'] ?> →</a>
         <?php endif; ?>
       </div>
     <?php endforeach; ?>

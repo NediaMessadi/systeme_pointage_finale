@@ -82,6 +82,21 @@ function initSqliteDb(): void {
         FOREIGN KEY(user_id) REFERENCES users(id)
     )");
 
+    $db->exec("CREATE TABLE IF NOT EXISTS working_time_assignments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        work_date TEXT NOT NULL,
+        start_time TEXT NOT NULL,
+        end_time TEXT NOT NULL,
+        note TEXT,
+        created_by INTEGER,
+        created_at TEXT DEFAULT (datetime('now')),
+        updated_at TEXT DEFAULT (datetime('now')),
+        UNIQUE(user_id, work_date),
+        FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL
+    )");
+
     $db->exec("CREATE TABLE IF NOT EXISTS quarter_scores (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
