@@ -21,9 +21,17 @@ $projet = $stmt->fetch();
 
 /* Charger les tâches du projet */
 $tasks = [];
+
 if ($projet) {
-    $tstmt = $pdo->prepare("SELECT * FROM tasks WHERE project_id=? ORDER BY sort_order ASC");
-    $tstmt->execute([$projet['id']]);
+
+    $tstmt = $pdo->prepare("
+        SELECT * FROM tasks
+        WHERE project_id = 0
+        ORDER BY sort_order ASC
+    ");
+
+    $tstmt->execute();
+
     $tasks = $tstmt->fetchAll();
 }
 
@@ -33,25 +41,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_task']) && $pr
     $tid = (int)$_POST['toggle_task'];
 
     // 🔥 UPDATE TASK
-    $pdo->prepare("
+$pdo->prepare("
     UPDATE tasks
     SET completed = NOT completed,
         completed_at = CASE
-        WHEN completed=0 THEN {$nowExpr}
+            WHEN completed = 0 THEN {$nowExpr}
             ELSE NULL
         END
-    WHERE id=? AND project_id=?
-    ")->execute([$tid, $projet['id']]);
+    WHERE id = ?
+")->execute([$tid]);
 
     // 🔥 RÉCUPÉRER TOUTES LES TÂCHES
     $stmtTasks = $pdo->prepare("
     SELECT completed
-    FROM tasks
-    WHERE project_id=?
-    ORDER BY sort_order ASC
-    ");
+FROM tasks
+WHERE project_id = 0
+ORDER BY sort_order ASC
+");
 
-    $stmtTasks->execute([$projet['id']]);
+    $stmtTasks->execute();
 
     $allTasks = $stmtTasks->fetchAll(PDO::FETCH_ASSOC);
 
@@ -66,10 +74,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_task']) && $pr
 $mqttMessage = implode('|', $states);
 
 // ✅ Envoi HTTP vers Node.js
-$ch = curl_init('http://192.168.0.151:3001/tasks');
+$ch = curl_init('http://192.168.0.241:3001/tasks');
 
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, $mqttMessage);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'X-User-Id: ' . $projet['user_id']
+]);
+
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_TIMEOUT, 2);
 
@@ -84,11 +96,20 @@ if ($response === false) {
 curl_close($ch);
 
     /* Vérifier si toutes tâches done → marquer projet en cours */
-    $cnt  = $pdo->prepare("SELECT COUNT(*) FROM tasks WHERE project_id=?");
-    $cnt->execute([$projet['id']]);
+    $cnt = $pdo->prepare("
+    SELECT COUNT(*)
+FROM tasks
+WHERE project_id = 0
+");
+    $cnt->execute();
     $all  = (int)$cnt->fetchColumn();
-    $done = $pdo->prepare("SELECT COUNT(*) FROM tasks WHERE project_id=? AND completed=1");
-    $done->execute([$projet['id']]);
+    $done = $pdo->prepare("
+SELECT COUNT(*)
+FROM tasks
+WHERE project_id = 0
+AND completed = 1
+");
+    $done->execute();
     $doneCount = (int)$done->fetchColumn();
 
     if ($projet['status'] === 'pending' && $doneCount > 0) {
@@ -99,23 +120,81 @@ curl_close($ch);
 }
 
 /* Toggle checklist finale */
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_checklist']) && $projet) {
-    $stAll  = $pdo->prepare("SELECT COUNT(*) FROM tasks WHERE project_id=?"); $stAll->execute([$projet['id']]); $cntAll = (int)$stAll->fetchColumn();
-    $stDone = $pdo->prepare("SELECT COUNT(*) FROM tasks WHERE project_id=? AND completed=1"); $stDone->execute([$projet['id']]); $cntDone = (int)$stDone->fetchColumn();
+if ($_SERVER['REQUEST_METHOD'] === 'POST'
+    && isset($_POST['toggle_checklist'])
+    && $projet) {
+
+    $stAll = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM tasks
+        WHERE project_id = 0
+    ");
+
+    $stAll->execute();
+
+    $cntAll = (int)$stAll->fetchColumn();
+
+    $stDone = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM tasks
+        WHERE project_id = 0
+        AND completed = 1
+    ");
+
+    $stDone->execute();
+
+    $cntDone = (int)$stDone->fetchColumn();
+
     if ($cntAll > 0 && $cntDone === $cntAll) {
+
         $newVal = (int)$projet['checklist_done'] ? 0 : 1;
-        $pdo->prepare("UPDATE projects SET checklist_done=? WHERE id=?")->execute([$newVal, $projet['id']]);
+
+        $pdo->prepare("
+            UPDATE projects
+            SET checklist_done = ?
+            WHERE id = ?
+        ")->execute([$newVal, $projet['id']]);
     }
-    header('Location: ?page=projet_courant'); exit;
+
+    header('Location: ?page=projet_courant');
+    exit;
 }
 
+
 /* Terminer projet */
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['terminer_projet']) && $projet) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST'
+    && isset($_POST['terminer_projet'])
+    && $projet) {
+
     /* Vérifier checklist cochée + toutes tâches faites */
-    $stAll  = $pdo->prepare("SELECT COUNT(*) FROM tasks WHERE project_id=?"); $stAll->execute([$projet['id']]); $cntAll = (int)$stAll->fetchColumn();
-    $stDone = $pdo->prepare("SELECT COUNT(*) FROM tasks WHERE project_id=? AND completed=1"); $stDone->execute([$projet['id']]); $cntDone = (int)$stDone->fetchColumn();
-    if ($cntAll === 0 || $cntDone < $cntAll || !(int)$projet['checklist_done']) {
-        header('Location: ?page=projet_courant'); exit;
+
+    $stAll = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM tasks
+        WHERE project_id = 0
+    ");
+
+    $stAll->execute();
+
+    $cntAll = (int)$stAll->fetchColumn();
+
+    $stDone = $pdo->prepare("
+        SELECT COUNT(*)
+        FROM tasks
+        WHERE project_id = 0
+        AND completed = 1
+    ");
+
+    $stDone->execute();
+
+    $cntDone = (int)$stDone->fetchColumn();
+
+    if ($cntAll === 0
+        || $cntDone < $cntAll
+        || !(int)$projet['checklist_done']) {
+
+        header('Location: ?page=projet_courant');
+        exit;
     }
 
     $dueDate     = $projet['due_date'];
@@ -125,7 +204,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['terminer_projet']) &&
     $pdo->prepare("UPDATE projects SET status='done', completed_at={$nowExpr}, score_awarded=?, checklist_done=1 WHERE id=?")->execute([$score, $projet['id']]);
     $pdo->prepare("UPDATE users SET score = score + ? WHERE id=?")->execute([$score, $uid]);
     $pdo->prepare("UPDATE tasks SET completed=1, completed_at={$nowExpr} WHERE project_id=? AND completed=0")->execute([$projet['id']]);
+    // Envoyer finish_result via HTTP vers Node.js
+    $finishResult = ($score === -1) ? 'g' : 'h';
 
+   /* ✅ ajouter user_id */
+    $finishResult .= '|' . $uid;
+
+    $ch2 = curl_init('http://192.168.0.241:3001/finish_result');
+
+    curl_setopt($ch2, CURLOPT_POST, true);
+    curl_setopt($ch2, CURLOPT_POSTFIELDS, $finishResult);
+    curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch2, CURLOPT_TIMEOUT, 2);
+    curl_exec($ch2);
+    curl_close($ch2);
     $scoreLabel = $score > 0 ? '+1' : ($score < 0 ? '-1' : '0');
     try { appLog('✅', "Projet {$projet['code']} terminé — Score: {$scoreLabel}", 'ok', $uid); } catch (Exception $e) {}
 
@@ -137,11 +229,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['description']) && $pr
     $pdo->prepare("UPDATE projects SET description=? WHERE id=?")->execute([$_POST['description'], $projet['id']]);
     header('Location: ?page=projet_courant'); exit;
 }
-
 /* Démarrer projet (pending → progress) */
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['start_project']) && $projet) {
-    $pdo->prepare("UPDATE projects SET status='progress' WHERE id=? AND status='pending'")->execute([$projet['id']]);
-    header('Location: ?page=projet_courant'); exit;
+if ($_SERVER['REQUEST_METHOD'] === 'POST'
+    && isset($_POST['start_project'])
+    && $projet) {
+
+    $pdo->prepare("
+        UPDATE projects
+        SET status='progress'
+        WHERE id=? AND status='pending'
+    ")->execute([$projet['id']]);
+
+    // ← attendre commit MySQL
+    usleep(300000);
+
+    // ← notifier ESP32 via sync
+    $ch = curl_init('http://192.168.0.241:3001/sync');
+
+    curl_setopt($ch, CURLOPT_POST, true);
+
+    // ✅ envoyer user_id
+    curl_setopt(
+        $ch,
+        CURLOPT_POSTFIELDS,
+        $projet['user_id']
+    );
+
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    curl_setopt($ch, CURLOPT_TIMEOUT, 2);
+
+    curl_exec($ch);
+
+    curl_close($ch);
+
+    header('Location: ?page=projet_courant');
+    exit;
 }
 ?>
 
